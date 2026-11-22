@@ -4,9 +4,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#171717">
+<meta name="description" content="Cheetah Engine is a Friday Night Funkin' engine built for modding, customization and creators.">
 <title>Cheetah Engine</title>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://api.github.com">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Cheetah Engine",
+  "applicationCategory": "GameApplication",
+  "operatingSystem": "Windows, Linux",
+  "url": "https://iamdantedev.github.io/CheetahEngine-Website/",
+  "description": "A Friday Night Funkin' engine built for modding, customization and creators.",
+  "softwareVersion": "Release",
+  "downloadUrl": [
+    "https://github.com/Cheetahbrawl291/FNFCheetahEngine/releases/download/Release/CheetahEngine-Windows.zip",
+    "https://github.com/Cheetahbrawl291/FNFCheetahEngine/releases/download/Release/CheetahEngine-Linux.zip"
+  ]
+}
+</script>
 <style>
 @font-face{font-family:'PhantomMuff';src:url('fonts/PhantomMuff 1.5-Regular.ttf') format('truetype');font-display:swap}
 :root{--bg:#191919;--surface:#222;--surface2:#292929;--text:#eee;--muted:#aaa;--accent:#c6ee5b;--border:#363636}
@@ -23,7 +41,13 @@ nav{max-width:1120px;margin:auto;min-height:64px;padding:10px 22px;display:flex;
 main{max-width:1120px;margin:0 auto;padding:28px 22px 65px}
 .hero{text-align:center;padding:30px 0 22px}
 .hero-art{width:min(420px,100%);margin:0 auto 16px;position:relative}
-.hero-logo{width:100%;height:auto;display:block;filter:drop-shadow(3px 4px 0 #111)}
+.hero-logo{width:100%;height:auto;display:block;filter:drop-shadow(3px 4px 0 #111);animation:logoBeat .6667s ease-in-out infinite}
+@keyframes logoBeat{0%,100%{transform:scale(1)}15%{transform:scale(1.12)}30%{transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){.hero-logo,.avatar{animation:none}}
+.features{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.feature{background:var(--surface);border:1px solid var(--border);padding:20px 16px;border-radius:4px;text-align:center}
+.feature strong{display:block;font-size:18px;color:var(--accent);margin-bottom:8px}
+.feature p{margin:0;color:#ccc;font-size:15px}
 .hero p{max-width:700px;margin:0 auto;color:#ddd;font-size:19px}
 .quicklinks{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:18px}
 .pill{display:inline-block;padding:8px 16px;border:1px solid #555;border-radius:4px;color:#eee;background:#262626;font-size:15px}
@@ -31,27 +55,26 @@ main{max-width:1120px;margin:0 auto;padding:28px 22px 65px}
 h2{font-size:29px;margin:0 0 13px;padding-bottom:7px;border-bottom:1px solid #4a4a4a}
 h3{font-size:20px;margin:0 0 8px}
 section{margin-top:38px}
-.download-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.download-card{background:var(--surface);border:1px solid var(--border);padding:17px;border-radius:4px;text-align:center}
-.download-card h3{font-size:19px}.download-card p{color:var(--muted);font-size:16px;margin:5px 0 13px}
-.card-icon{width:20px;height:20px;vertical-align:-4px;margin-right:6px;filter:brightness(0) invert(1)}
 .button{display:inline-block;padding:9px 16px;border-radius:3px;background:var(--accent);color:#171717;font-weight:700;font-size:15px}
 .button:hover{filter:brightness(1.08);text-decoration:none}
 .button--discord{background:#5865F2;color:#fff}
-.locked{opacity:.45;filter:grayscale(1);cursor:not-allowed;user-select:none}
 .btn-icon{width:16px;height:16px;vertical-align:-3px;margin-right:6px}
 .experimental{background:#242424;border:1px solid var(--border);padding:18px;border-radius:4px}
-.experimental p{color:#bbb;margin:0 0 14px;font-size:17px}
 .os-links{display:flex;gap:10px;flex-wrap:wrap}
 .os-links a{background:#303030;border:1px solid #484848;border-radius:3px;padding:9px 18px;color:#eee;font-weight:700;font-size:15px}
 .os-links a:hover{border-color:var(--accent);text-decoration:none}
 .os-icon{width:16px;height:16px;vertical-align:-3px;margin-right:6px;filter:brightness(0) invert(1)}
-.notice{font-size:14px;color:#999;margin-top:13px}
+.dl-count{font-size:12px;font-weight:400;color:var(--muted);margin-left:5px}
+.star-count{font-size:11px;font-weight:400;color:var(--accent);margin-left:6px}
+.release-meta{font-size:13px;color:var(--muted);margin-top:12px}
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .55s ease,transform .55s ease}
+.reveal.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
 .community{text-align:center;padding:22px;background:#222;border:1px solid var(--border);border-radius:4px}
 .community p{margin:0 0 13px;color:#ccc}
 .donors{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .donor{background:var(--surface);border:1px solid var(--border);padding:18px 10px;text-align:center;border-radius:4px}
-.avatar{width:52px;height:52px;border-radius:50%;margin:0 auto 10px;background:linear-gradient(135deg,#c6ee5b,#596f2b);display:grid;place-items:center;color:#171717;font-size:20px;font-weight:900;overflow:hidden}
+.avatar{width:52px;height:52px;border-radius:50%;margin:0 auto 10px;background:linear-gradient(135deg,#c6ee5b,#596f2b);display:grid;place-items:center;color:#171717;font-size:20px;font-weight:900;overflow:hidden;animation:logoBeat .6667s ease-in-out infinite}
 .avatar img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%}
 .donor strong{display:block;font-size:16px}.donor small{color:var(--muted);font-size:14px}
 .donor a{color:var(--text)}.donor a:hover{color:var(--accent)}
@@ -74,13 +97,12 @@ footer a{color:#ccc}
   ::-webkit-scrollbar{width:14px;height:14px}
   ::-webkit-scrollbar-track{background:#191919}
   ::-webkit-scrollbar-thumb{background:#c6ee5b;border:3px solid #191919;border-radius:8px}
-  p,.hero p,.notice,.community p,.download-card p,.experimental p,small{cursor:url('assets/Cursor/cursor-text-sm.png') 10 16,text}
-  a:not(.locked):not([aria-disabled="true"]),button:not(.locked){cursor:url('assets/Cursor/cursor-pointer.png') 10 2,pointer}
-  .locked,a[aria-disabled="true"]{cursor:url('assets/Cursor/cursor-cross-sm.png') 16 16,not-allowed}
+  p,small{cursor:url('assets/Cursor/cursor-text-sm.png') 10 16,text}
+  a,button{cursor:url('assets/Cursor/cursor-pointer.png') 10 2,pointer}
   html.over-scrollbar,html.over-scrollbar *{cursor:url('assets/Cursor/cursor-scroll-sm.png') 16 16,pointer!important}
 }
-@media(max-width:760px){.download-grid{grid-template-columns:1fr}.donors{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:520px){nav{align-items:flex-start;flex-direction:column}.navlinks{gap:16px;flex-wrap:wrap}.donors{grid-template-columns:repeat(2,1fr)}main{padding-inline:14px}}
+@media(max-width:760px){.donors{grid-template-columns:repeat(2,1fr)}.features{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){nav{align-items:flex-start;flex-direction:column}.navlinks{gap:16px;flex-wrap:wrap}.donors{grid-template-columns:repeat(2,1fr)}.features{grid-template-columns:1fr}main{padding-inline:14px}}
 </style>
 </head>
 <body>
@@ -88,9 +110,10 @@ footer a{color:#ccc}
   <button class="intro-gate" id="introGate" type="button" aria-label="Touch here to view the intro">
     <img src="assets/TouchHereToView!.png" alt="Touch here to view">
   </button>
-  <video id="introVideo" src="assets/introSelect.mp4" playsinline preload="auto"></video>
+  <video id="introVideo" src="assets/introSelect.mp4" playsinline preload="none"></video>
 </div>
 <div class="intro-flash" id="introFlash" aria-hidden="true"></div>
+<audio id="siteMusic" src="assets/stayFunky.ogg" loop preload="auto"></audio>
 <header>
 <nav>
 <a class="logo" href="#top"><img class="logo-icon" src="assets/icon.png" alt=""><span>CHEETAH ENGINE</span></a>
@@ -108,20 +131,21 @@ footer a{color:#ccc}
   </div>
 </div>
 
-<section id="downloads">
-<h2>Downloads</h2>
-<div class="download-grid">
-  <article class="download-card"><h3><img class="card-icon" src="assets/github.svg" alt=""> GitHub Releases</h3><p>Get the latest stable version of Cheetah Engine.</p><a class="button" href="https://github.com/Cheetahbrawl291/FNFCheetahEngine" target="_blank" rel="noopener">GitHub</a></article>
-  <article class="download-card"><h3><img class="card-icon" src="assets/gamebanana.svg" alt=""> GameBanana</h3><p>Find releases and community-made content.</p><a class="button" href="https://gamebanana.com/wips/104076" target="_blank" rel="noopener">GameBanana</a></article>
+<section id="features">
+<h2>Features</h2>
+<div class="features">
+<div class="feature"><strong>Modding</strong><p>An engine built from the ground up for Friday Night Funkin' mods.</p></div>
+<div class="feature"><strong>Customization</strong><p>Shape the engine around your project.</p></div>
+<div class="feature"><strong>Charting</strong><p>Tools that help bring your ideas to life.</p></div>
+<div class="feature"><strong>Cross-platform</strong><p>Windows and Linux builds available.</p></div>
 </div>
 </section>
 
-<section id="experimental">
-<h2>Experimental Downloads</h2>
+<section id="downloads">
+<h2>Downloads</h2>
 <div class="experimental">
-<p>These builds are generated from the latest development changes. They may contain unfinished features or bugs, so use them for testing.</p>
-<div class="os-links"><a href="https://github.com/Cheetahbrawl291/FNFCheetahEngine/releases/download/Release/CheetahEngine-Windows.zip"><img class="os-icon" src="assets/Windows.svg" alt=""> Windows</a><a href="https://github.com/Cheetahbrawl291/FNFCheetahEngine/releases/download/Release/CheetahEngine-Linux.zip"><img class="os-icon" src="assets/Linux.svg" alt=""> Linux</a><a href="https://github.com/Cheetahbrawl291/FNFCheetahEngine/releases" target="_blank" rel="noopener"><img class="os-icon" src="assets/github.svg" alt=""> View other versions</a></div>
-<div class="notice">Experimental builds are not recommended for projects that need a stable release.</div>
+<div class="os-links"><a href="https://github.com/Cheetahbrawl291/FNFCheetahEngine/releases/download/Release/CheetahEngine-Windows.zip"><img class="os-icon" src="assets/Windows.svg" alt=""> Windows<span class="dl-count" data-asset="CheetahEngine-Windows.zip"></span></a><a href="https://github.com/Cheetahbrawl291/FNFCheetahEngine/releases/download/Release/CheetahEngine-Linux.zip"><img class="os-icon" src="assets/Linux.svg" alt=""> Linux<span class="dl-count" data-asset="CheetahEngine-Linux.zip"></span></a><a href="https://github.com/Cheetahbrawl291/FNFCheetahEngine/releases" target="_blank" rel="noopener"><img class="os-icon" src="assets/github.svg" alt=""> View other versions</a><a href="https://gamebanana.com/wips/104076" target="_blank" rel="noopener"><img class="os-icon" src="assets/gamebanana.svg" alt=""> GameBanana</a></div>
+<div class="release-meta" id="releaseMeta"></div>
 </div>
 </section>
 
@@ -131,7 +155,7 @@ footer a{color:#ccc}
 <p>Stay up to date, share your creations and talk with other Cheetah Engine users.</p>
 <a class="button button--discord" href="https://discord.gg/ma6dKBHPRp" target="_blank" rel="noopener"><img class="btn-icon" src="assets/discord.svg" alt=""> Discord Server ↗</a>
 <p style="font-size:12px;margin:14px 0 0">Website repository · Engine source code</p>
-<div class="quicklinks"><a class="pill" href="https://github.com/IamDanteDev/CheetahEngine-Website" target="_blank" rel="noopener">Website Repository</a><a class="pill" href="https://github.com/Cheetahbrawl291/FNFCheetahEngine" target="_blank" rel="noopener">Engine Repository</a></div>
+<div class="quicklinks"><a class="pill" href="https://github.com/IamDanteDev/CheetahEngine-Website" target="_blank" rel="noopener">Website Repository</a><a class="pill" href="https://github.com/Cheetahbrawl291/FNFCheetahEngine" target="_blank" rel="noopener">Engine Repository<span class="star-count" data-repo="Cheetahbrawl291/FNFCheetahEngine"></span></a><a class="pill" href="https://github.com/Cheetahbrawl291/FNFCheetahEngine/issues" target="_blank" rel="noopener">Report an issue</a></div>
 </div>
 </section>
 
@@ -148,8 +172,8 @@ footer a{color:#ccc}
 </section>
 </main>
 <footer>
-<div class="footlinks"><a href="#downloads">Downloads</a><a href="#experimental">Experimental</a></div>
-<div>© 2026 Cheetah Engine · Made for the Friday Night Funkin' modding community.</div>
+<div class="footlinks"><a href="#downloads">Downloads</a><a href="https://github.com/Cheetahbrawl291/FNFCheetahEngine" target="_blank" rel="noopener">GitHub</a><a href="https://gamebanana.com/wips/104076" target="_blank" rel="noopener">GameBanana</a><a href="https://discord.gg/ma6dKBHPRp" target="_blank" rel="noopener">Discord</a></div>
+<div>© <span id="year">2026</span> Cheetah Engine · Made for the Friday Night Funkin' modding community.</div>
 </footer>
 <script>
 (function () {
@@ -169,23 +193,141 @@ document.addEventListener('selectstart', function (e) {
   if (e.target.tagName === 'IMG') e.preventDefault();
 });
 (function () {
+  var nodes = document.querySelectorAll('.dl-count');
+  var meta = document.getElementById('releaseMeta');
+  if (!nodes.length || !window.fetch) return;
+  var cacheKey = 'cheetah-release-info-v3';
+  function sizeLabel(bytes) { return (bytes / 1048576).toFixed(0) + ' MB'; }
+  function render(info) {
+    nodes.forEach(function (n) {
+      var name = n.getAttribute('data-asset');
+      var value = info.counts[name];
+      if (typeof value !== 'number') return;
+      var size = info.sizes[name];
+      n.textContent = value.toLocaleString() + ' downloads' + (typeof size === 'number' ? ' · ' + sizeLabel(size) : '');
+    });
+    if (meta && info.date) {
+      var date = new Date(info.date);
+      if (!isNaN(date.getTime())) {
+        meta.textContent = (info.tag ? info.tag + ' · ' : '') + 'Updated ' + date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      }
+    }
+  }
+  try {
+    var cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+    if (cached && Date.now() - cached.time < 600000) { render(cached.info); return; }
+  } catch (e) {}
+  fetch('https://api.github.com/repos/Cheetahbrawl291/FNFCheetahEngine/releases/tags/Release')
+    .then(function (r) { if (!r.ok) throw new Error('release api'); return r.json(); })
+    .then(function (data) {
+      var info = { counts: {}, sizes: {}, date: data.published_at, tag: data.tag_name };
+      (data.assets || []).forEach(function (a) {
+        info.counts[a.name] = a.download_count;
+        info.sizes[a.name] = a.size;
+      });
+      render(info);
+      try { localStorage.setItem(cacheKey, JSON.stringify({ time: Date.now(), info: info })); } catch (e) {}
+    })
+    .catch(function () {});
+})();
+(function () {
+  var year = document.getElementById('year');
+  if (year) year.textContent = new Date().getFullYear();
+
+  var stars = document.querySelectorAll('.star-count');
+  if (!stars.length || !window.fetch) return;
+  var cacheKey = 'cheetah-stars-v1';
+  function render(counts) {
+    stars.forEach(function (n) {
+      var value = counts[n.getAttribute('data-repo')];
+      if (typeof value === 'number') n.textContent = ' ★ ' + value.toLocaleString();
+    });
+  }
+  try {
+    var cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+    if (cached && Date.now() - cached.time < 600000) { render(cached.counts); return; }
+  } catch (e) {}
+  fetch('https://api.github.com/repos/Cheetahbrawl291/FNFCheetahEngine')
+    .then(function (r) { if (!r.ok) throw new Error('repo api'); return r.json(); })
+    .then(function (data) {
+      var counts = { 'Cheetahbrawl291/FNFCheetahEngine': data.stargazers_count };
+      render(counts);
+      try { localStorage.setItem(cacheKey, JSON.stringify({ time: Date.now(), counts: counts })); } catch (e) {}
+    })
+    .catch(function () {});
+})();
+(function () {
+  if (!('IntersectionObserver' in window)) return;
+  if (window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('in');
+      observer.unobserve(entry.target);
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('main > section').forEach(function (el) {
+    el.classList.add('reveal');
+    observer.observe(el);
+  });
+})();
+(function () {
   var intro = document.getElementById('intro');
   var gate = document.getElementById('introGate');
   var video = document.getElementById('introVideo');
   var flash = document.getElementById('introFlash');
+  var music = document.getElementById('siteMusic');
   var started = false;
   var finished = false;
+  var musicStarted = false;
+
+  function setMediaMetadata() {
+    if (!('mediaSession' in navigator) || !window.MediaMetadata) return;
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: 'stay funky',
+      artist: 'Kawai Sprite feat. Lotus Juice',
+      artwork: [{ src: 'assets/stayFunky.png', sizes: '262x262', type: 'image/png' }]
+    });
+  }
+
+  function startMusic() {
+    if (musicStarted) return;
+    musicStarted = true;
+    setMediaMetadata();
+    music.volume = 0;
+    var playMusic = music.play();
+    if (playMusic && playMusic.catch) playMusic.catch(function () { musicStarted = false; });
+    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
+    var step = 0;
+    var timer = setInterval(function () {
+      step += 1;
+      music.volume = 0.25 * (step / 20);
+      if (step >= 20) clearInterval(timer);
+    }, 25);
+  }
 
   function flashOut() {
     if (finished) return;
     finished = true;
     flash.classList.add('on');
     intro.remove();
+    startMusic();
     window.setTimeout(function () {
       flash.classList.remove('on');
       window.setTimeout(function () { flash.remove(); }, 470);
     }, 140);
   }
+
+  function preloadIntro() {
+    video.preload = 'auto';
+    video.load();
+    gate.removeEventListener('mouseenter', preloadIntro);
+    gate.removeEventListener('focus', preloadIntro);
+    gate.removeEventListener('touchstart', preloadIntro);
+  }
+  gate.addEventListener('mouseenter', preloadIntro);
+  gate.addEventListener('focus', preloadIntro);
+  gate.addEventListener('touchstart', preloadIntro);
 
   gate.addEventListener('click', function () {
     if (started) return;
