@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#171717">
+<title>Cheetah Engine</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<style>
+@font-face{font-family:'PhantomMuff';src:url('fonts/PhantomMuff 1.5-Regular.ttf') format('truetype');font-display:swap}
+:root{--bg:#191919;--surface:#222;--surface2:#292929;--text:#eee;--muted:#aaa;--accent:#c6ee5b;--border:#363636}
+*{box-sizing:border-box}
+img{user-select:none;-webkit-user-select:none;-webkit-user-drag:none;-webkit-touch-callout:none;pointer-events:none}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:18px/1.6 'PhantomMuff',Arial,sans-serif}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+header{background:#202020;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
+nav{max-width:1120px;margin:auto;min-height:64px;padding:10px 22px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.logo{display:flex;align-items:center;gap:10px;color:#fff;font-weight:800;font-size:19px;letter-spacing:.5px}
+.logo-icon{height:36px;width:auto;object-fit:contain}
+.navlinks{display:flex;gap:25px;align-items:center}.navlinks a{color:#ddd;font-size:14px}
+main{max-width:1120px;margin:0 auto;padding:28px 22px 65px}
+.hero{text-align:center;padding:30px 0 22px}
+.hero-art{width:min(420px,100%);margin:0 auto 16px;position:relative}
+.hero-logo{width:100%;height:auto;display:block;filter:drop-shadow(3px 4px 0 #111)}
+.hero p{max-width:700px;margin:0 auto;color:#ddd;font-size:19px}
+.quicklinks{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:18px}
+.pill{display:inline-block;padding:8px 16px;border:1px solid #555;border-radius:4px;color:#eee;background:#262626;font-size:15px}
+.pill:hover{border-color:var(--accent);text-decoration:none}
+h2{font-size:29px;margin:0 0 13px;padding-bottom:7px;border-bottom:1px solid #4a4a4a}
+h3{font-size:20px;margin:0 0 8px}
+section{margin-top:38px}
+.download-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.download-card{background:var(--surface);border:1px solid var(--border);padding:17px;border-radius:4px;text-align:center}
+.download-card h3{font-size:19px}.download-card p{color:var(--muted);font-size:16px;margin:5px 0 13px}
+.card-icon{width:20px;height:20px;vertical-align:-4px;margin-right:6px;filter:brightness(0) invert(1)}
+.button{display:inline-block;padding:9px 16px;border-radius:3px;background:var(--accent);color:#171717;font-weight:700;font-size:15px}
+.button:hover{filter:brightness(1.08);text-decoration:none}
+.btn-icon{width:16px;height:16px;vertical-align:-3px;margin-right:6px}
+.experimental{background:#242424;border:1px solid var(--border);padding:18px;border-radius:4px}
+.experimental p{color:#bbb;margin:0 0 14px;font-size:17px}
+.os-links{display:flex;gap:10px;flex-wrap:wrap}
+.os-links a{background:#303030;border:1px solid #484848;border-radius:3px;padding:9px 18px;color:#eee;font-weight:700;font-size:15px}
+.os-links a:hover{border-color:var(--accent);text-decoration:none}
+.os-icon{width:16px;height:16px;vertical-align:-3px;margin-right:6px;filter:brightness(0) invert(1)}
+.notice{font-size:14px;color:#999;margin-top:13px}
+.community{text-align:center;padding:22px;background:#222;border:1px solid var(--border);border-radius:4px}
+.community p{margin:0 0 13px;color:#ccc}
+.donors{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.donor{background:var(--surface);border:1px solid var(--border);padding:18px 10px;text-align:center;border-radius:4px}
+.avatar{width:52px;height:52px;border-radius:50%;margin:0 auto 10px;background:linear-gradient(135deg,#c6ee5b,#596f2b);display:grid;place-items:center;color:#171717;font-size:20px;font-weight:900}
+.donor strong{display:block;font-size:16px}.donor small{color:var(--muted);font-size:14px}
+.donor a{color:var(--text)}.donor a:hover{color:var(--accent)}
+footer{border-top:1px solid var(--border);background:#202020;color:#999;padding:25px 22px;text-align:center;font-size:12px}
+footer .footlinks{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-bottom:10px}
+footer a{color:#ccc}
+/* Intro (FNF charselect gate + video) */
+.intro{position:fixed;inset:0;z-index:100;background:#000;display:grid;place-items:center}
+.intro-gate{position:absolute;inset:0;width:100%;height:100%;border:0;background:none;padding:20px;display:grid;place-items:center;cursor:pointer;animation:gatePulse 1.1s ease-in-out infinite}
+.intro-gate img{max-width:min(440px,80vw);max-height:62vh;object-fit:contain;filter:drop-shadow(4px 6px 0 rgba(0,0,0,.7))}
+@keyframes gatePulse{50%{transform:scale(1.035)}}
+.intro video{width:100%;height:100%;object-fit:contain;display:none;background:#000}
+.intro.playing .intro-gate{display:none}
+.intro.playing video{display:block}
+.intro-flash{position:fixed;inset:0;z-index:101;background:#fff;opacity:0;pointer-events:none;transition:opacity .45s ease-out}
+.intro-flash.on{opacity:1;transition:none}
+@media(prefers-reduced-motion:reduce){.intro-gate{animation:none}}
+@media(max-width:760px){.download-grid{grid-template-columns:1fr}.donors{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){nav{align-items:flex-start;flex-direction:column}.navlinks{gap:16px;flex-wrap:wrap}.donors{grid-template-columns:repeat(2,1fr)}main{padding-inline:14px}}
+</style>
+</head>
+<body>
+<div class="intro" id="intro" aria-label="Intro">
+  <button class="intro-gate" id="introGate" type="button" aria-label="Touch here to view the intro">
+    <img src="assets/TouchHereToView!.png" alt="Touch here to view">
+  </button>
+  <video id="introVideo" src="assets/introSelect.mp4" playsinline preload="auto"></video>
+</div>
+<div class="intro-flash" id="introFlash" aria-hidden="true"></div>
+<header>
+<nav>
+<a class="logo" href="#top"><img class="logo-icon" src="assets/icon.png" alt=""><span>CHEETAH ENGINE</span></a>
+<div class="navlinks"><a href="#downloads">Downloads</a></div>
+</nav>
+</header>
+<main id="top">
+<div class="hero">
+  <div class="hero-art">
+    <img class="hero-logo" src="assets/engine-logo.png" alt="Cheetah Engine logo">
+  </div>
+  <p>Cheetah Engine is a Friday Night Funkin' engine focused on modding, customization and giving creators the tools to bring their ideas to life.</p>
+  <div class="quicklinks">
+    <a class="pill" href="#downloads">Downloads</a><a class="pill" href="#community">Discord Server</a>
+  </div>
+</div>
+
+<section id="downloads">
+<h2>Downloads</h2>
+<div class="download-grid">
+  <article class="download-card"><h3><img class="card-icon" src="assets/github.svg" alt=""> GitHub Releases</h3><p>Get the latest stable version of Cheetah Engine.</p><a class="button" href="https://github.com/Cheetahbrawl291/FNFCheetahEngine" target="_blank" rel="noopener">GitHub</a></article>
+  <article class="download-card"><h3><img class="card-icon" src="assets/gamebanana.svg" alt=""> GameBanana</h3><p>Find releases and community-made content.</p><a class="button" href="https://gamebanana.com/wips/104076" target="_blank" rel="noopener">GameBanana</a></article>
+</div>
+</section>
+
+<section id="experimental">
+<h2>Experimental Downloads</h2>
+<div class="experimental">
+<p>These builds are generated from the latest development changes. They may contain unfinished features or bugs, so use them for testing.</p>
+<div class="os-links"><a href="#experimental"><img class="os-icon" src="assets/Windows.svg" alt=""> Windows</a><a href="#experimental">macOS</a><a href="#experimental"><img class="os-icon" src="assets/Linux.svg" alt=""> Linux</a></div>
+<div class="notice">Experimental builds are not recommended for projects that need a stable release.</div>
+</div>
+</section>
+
+<section id="community">
+<div class="community">
+<h2 style="border:0;margin-bottom:7px">Join the community!</h2>
+<p>Stay up to date, share your creations and talk with other Cheetah Engine users.</p>
+<a class="button" href="https://discord.gg/ma6dKBHPRp" target="_blank" rel="noopener"><img class="btn-icon" src="assets/discord.svg" alt=""> Discord Server ↗</a>
+<p style="font-size:12px;margin:14px 0 0">Website repository · Engine source code</p>
+<div class="quicklinks"><a class="pill" href="https://github.com/" target="_blank" rel="noopener">Website Repository</a><a class="pill" href="https://github.com/Cheetahbrawl291/FNFCheetahEngine" target="_blank" rel="noopener">Engine Repository</a></div>
+</div>
+</section>
+
+<section id="developers">
+<h2>Developers</h2>
+<div class="donors">
+  <div class="donor"><div class="avatar">C</div><strong><a href="https://www.youtube.com/@CheetahTheGamer" target="_blank" rel="noopener">Cheetah</a></strong><small>Owner</small></div>
+  <div class="donor"><div class="avatar">D</div><strong><a href="https://www.youtube.com/@IamDanteDev" target="_blank" rel="noopener">IamDanteDav</a></strong><small>Coder</small></div>
+  <div class="donor"><div class="avatar">CV</div><strong><a href="https://gamebanana.com/members/1787065" target="_blank" rel="noopener">Commander Video</a></strong><small>Modchart Editor</small></div>
+  <div class="donor"><div class="avatar">S</div><strong><a href="https://github.com/Slushi-Github" target="_blank" rel="noopener">Slushi</a></strong><small>Windows API</small></div>
+</div>
+</section>
+</main>
+<footer>
+<div class="footlinks"><a href="#downloads">Downloads</a><a href="#experimental">Experimental</a></div>
+<div>© 2026 Cheetah Engine · Made for the Friday Night Funkin' modding community.</div>
+</footer>
+<script>
+document.querySelectorAll('img').forEach(function (img) { img.draggable = false; });
+document.addEventListener('dragstart', function (e) { e.preventDefault(); });
+document.addEventListener('selectstart', function (e) {
+  if (e.target.tagName === 'IMG') e.preventDefault();
+});
+(function () {
+  var intro = document.getElementById('intro');
+  var gate = document.getElementById('introGate');
+  var video = document.getElementById('introVideo');
+  var flash = document.getElementById('introFlash');
+  var started = false;
+  var finished = false;
+
+  function flashOut() {
+    if (finished) return;
+    finished = true;
+    flash.classList.add('on');
+    intro.remove();
+    window.setTimeout(function () {
+      flash.classList.remove('on');
+      window.setTimeout(function () { flash.remove(); }, 470);
+    }, 140);
+  }
+
+  gate.addEventListener('click', function () {
+    if (started) return;
+    started = true;
+    intro.classList.add('playing');
+    video.volume = 0.45;
+    video.muted = false;
+    var play = video.play();
+    if (play && play.catch) play.catch(function () {
+      video.muted = true;
+      var retry = video.play();
+      if (retry && retry.catch) retry.catch(flashOut);
+    });
+  });
+
+  video.addEventListener('ended', flashOut);
+  video.addEventListener('error', flashOut);
+})();
+</script>
+</body>
+</html>
