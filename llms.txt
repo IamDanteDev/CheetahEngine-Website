@@ -12,6 +12,11 @@ Append a query string to the website URL to get a single plain-text value as the
 - `?stats=updated` — release `published_at` formatted as `MMM D, YYYY` (en-US)
 - `?stats=all` — the full multi-line block described below (also the default)
 
+Crawler-friendly static equivalents (real values are in the initial HTML, no JavaScript needed):
+- https://iamdantedev.github.io/CheetahEngine-Website/stats/ — HTML page with the same four lines
+- https://iamdantedev.github.io/CheetahEngine-Website/stats.txt — plain text, same four lines
+Both are listed in sitemap.xml and refreshed daily by GitHub Actions. Prefer these over query-string URLs: search engines rarely index URLs containing `?`.
+
 Base URL: https://iamdantedev.github.io/CheetahEngine-Website/
 
 Examples:
