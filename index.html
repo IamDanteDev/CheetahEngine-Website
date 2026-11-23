@@ -32,6 +32,8 @@
 img{user-select:none;-webkit-user-select:none;-webkit-user-drag:none;-webkit-touch-callout:none;pointer-events:none}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--text);font:18px/1.6 'PhantomMuff',Arial,sans-serif}
+.corner-bf{position:fixed;left:0;bottom:0;width:min(240px,28vw);height:auto;z-index:2;pointer-events:none;transition:opacity .25s ease,visibility 0s linear .25s}
+.corner-bf.is-hidden{opacity:0;visibility:hidden}
 a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
 header{background:#202020;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
 nav{max-width:1120px;margin:auto;min-height:64px;padding:10px 22px;display:flex;align-items:center;justify-content:space-between;gap:20px}
@@ -67,6 +69,11 @@ section{margin-top:38px}
 .dl-count{font-size:12px;font-weight:400;color:var(--muted);margin-left:5px}
 .star-count{font-size:11px;font-weight:400;color:var(--accent);margin-left:6px}
 .release-meta{font-size:13px;color:var(--muted);margin-top:12px}
+.api-string{background:#171717;border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:3px;padding:12px 15px;margin-top:14px;font-size:13px;color:#ccc;white-space:pre-wrap;word-break:break-word}
+.api-string b{color:var(--accent);font-weight:400}
+#statsOutput{display:none}
+html.stats-mode body>*:not(#statsOutput){display:none!important}
+html.stats-mode #statsOutput{display:block;min-height:100vh;margin:0;padding:24px;background:var(--bg);color:var(--text);font:16px/1.6 monospace;white-space:pre-wrap}
 .reveal{opacity:0;transform:translateY(16px);transition:opacity .55s ease,transform .55s ease}
 .reveal.in{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
@@ -106,6 +113,20 @@ footer a{color:#ccc}
 </style>
 </head>
 <body>
+<script>
+(function () {
+  var m = location.search.match(/[?&](?:stats|api)=([^&#]*)/);
+  if (!m) return;
+  var key = decodeURIComponent(m[1]).toLowerCase();
+  if (!/^(total|windows|linux|updated|all)$/.test(key)) key = 'all';
+  var root = document.documentElement;
+  root.setAttribute('data-stats', key);
+  if (root.classList) root.classList.add('stats-mode');
+  else root.className += ' stats-mode';
+})();
+</script>
+<div id="statsOutput" aria-live="polite">Loading...</div>
+<img class="corner-bf" src="assets/BFdj.gif" alt="" aria-hidden="true">
 <div class="intro" id="intro" aria-label="Intro">
   <button class="intro-gate" id="introGate" type="button" aria-label="Touch here to view the intro">
     <img src="assets/TouchHereToView!.png" alt="Touch here to view">
@@ -146,6 +167,7 @@ footer a{color:#ccc}
 <div class="experimental">
 <div class="os-links"><a href="https://github.com/Cheetahbrawl291/FNFCheetahEngine/releases/download/Release/CheetahEngine-Windows.zip"><img class="os-icon" src="assets/Windows.svg" alt=""> Windows<span class="dl-count" data-asset="CheetahEngine-Windows.zip"></span></a><a href="https://github.com/Cheetahbrawl291/FNFCheetahEngine/releases/download/Release/CheetahEngine-Linux.zip"><img class="os-icon" src="assets/Linux.svg" alt=""> Linux<span class="dl-count" data-asset="CheetahEngine-Linux.zip"></span></a><a href="https://github.com/Cheetahbrawl291/FNFCheetahEngine/releases" target="_blank" rel="noopener"><img class="os-icon" src="assets/github.svg" alt=""> View other versions</a><a href="https://gamebanana.com/wips/104076" target="_blank" rel="noopener"><img class="os-icon" src="assets/gamebanana.svg" alt=""> GameBanana</a></div>
 <div class="release-meta" id="releaseMeta"></div>
+<div class="api-string" id="apiString" aria-live="polite"></div>
 </div>
 </section>
 
@@ -195,9 +217,33 @@ document.addEventListener('selectstart', function (e) {
 (function () {
   var nodes = document.querySelectorAll('.dl-count');
   var meta = document.getElementById('releaseMeta');
+  var apiString = document.getElementById('apiString');
+  var root = document.documentElement;
   if (!nodes.length || !window.fetch) return;
-  var cacheKey = 'cheetah-release-info-v3';
+  var cacheKey = 'cheetah-release-info-v4';
   function sizeLabel(bytes) { return (bytes / 1048576).toFixed(0) + ' MB'; }
+  function dateLabel(iso) {
+    var date = new Date(iso);
+    return isNaN(date.getTime()) ? '' : date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+  function assetCount(info, name) {
+    return typeof info.counts[name] === 'number' ? info.counts[name] : 0;
+  }
+  function statsValue(info, key) {
+    var entries = Object.keys(info.counts).sort();
+    var total = entries.reduce(function (sum, name) { return sum + assetCount(info, name); }, 0);
+    if (key === 'total') return String(total);
+    if (key === 'windows') return String(assetCount(info, 'CheetahEngine-Windows.zip'));
+    if (key === 'linux') return String(assetCount(info, 'CheetahEngine-Linux.zip'));
+    if (key === 'updated') return info.date ? dateLabel(info.date) : '';
+    var lines = ['Total downloads: ' + total.toLocaleString()];
+    entries.forEach(function (name) {
+      var os = name.replace(/^CheetahEngine-/, '').replace(/\.zip$/i, '');
+      lines.push(os + ': ' + assetCount(info, name).toLocaleString());
+    });
+    if (info.date && dateLabel(info.date)) lines.push('Last update: ' + dateLabel(info.date));
+    return lines.join('\n');
+  }
   function render(info) {
     nodes.forEach(function (n) {
       var name = n.getAttribute('data-asset');
@@ -206,11 +252,14 @@ document.addEventListener('selectstart', function (e) {
       var size = info.sizes[name];
       n.textContent = value.toLocaleString() + ' downloads' + (typeof size === 'number' ? ' · ' + sizeLabel(size) : '');
     });
-    if (meta && info.date) {
-      var date = new Date(info.date);
-      if (!isNaN(date.getTime())) {
-        meta.textContent = (info.tag ? info.tag + ' · ' : '') + 'Updated ' + date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-      }
+    var updated = info.date ? dateLabel(info.date) : '';
+    if (meta && updated) {
+      meta.textContent = (info.tag ? info.tag + ' · ' : '') + 'Updated ' + updated;
+    }
+    if (apiString) apiString.textContent = statsValue(info, 'all');
+    var statsEl = document.getElementById('statsOutput');
+    if (statsEl && root.hasAttribute('data-stats')) {
+      statsEl.textContent = statsValue(info, root.getAttribute('data-stats'));
     }
   }
   try {
@@ -228,7 +277,12 @@ document.addEventListener('selectstart', function (e) {
       render(info);
       try { localStorage.setItem(cacheKey, JSON.stringify({ time: Date.now(), info: info })); } catch (e) {}
     })
-    .catch(function () {});
+    .catch(function () {
+      var statsEl = document.getElementById('statsOutput');
+      if (statsEl && root.hasAttribute('data-stats') && statsEl.textContent === 'Loading...') {
+        statsEl.textContent = 'Unavailable';
+      }
+    });
 })();
 (function () {
   var year = document.getElementById('year');
@@ -345,6 +399,85 @@ document.addEventListener('selectstart', function (e) {
 
   video.addEventListener('ended', flashOut);
   video.addEventListener('error', flashOut);
+})();
+(function () {
+  var bf = document.querySelector('.corner-bf');
+  if (!bf) return;
+
+  var hidden = null;
+  var queued = false;
+
+  function intersects(r, t) {
+    return t.right > r.left && t.left < r.right && t.bottom > r.top && t.top < r.bottom;
+  }
+
+  function isVisible(el) {
+    for (var p = el; p && p !== document.documentElement; p = p.parentElement) {
+      var style = window.getComputedStyle(p);
+      if (style.display === 'none' || style.visibility === 'hidden' || parseFloat(style.opacity) === 0)
+        return false;
+    }
+    return true;
+  }
+
+  function overlapsContent() {
+    var box = bf.getBoundingClientRect();
+    if (!box.width || !box.height) return false;
+
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (node) {
+        if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+        var parent = node.parentElement;
+        if (!parent || parent.closest('.corner-bf, .intro, .intro-flash') || !isVisible(parent))
+          return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    var node;
+    while ((node = walker.nextNode())) {
+      var range = document.createRange();
+      range.selectNodeContents(node);
+      var rects = range.getClientRects();
+      for (var i = 0; i < rects.length; i++)
+        if (intersects(box, rects[i])) return true;
+    }
+
+    var controls = document.querySelectorAll('a,button,input,select,textarea');
+    for (var j = 0; j < controls.length; j++) {
+      var el = controls[j];
+      if (el.closest('.corner-bf, .intro') || !isVisible(el)) continue;
+      if (intersects(box, el.getBoundingClientRect())) return true;
+    }
+    return false;
+  }
+
+  function apply() {
+    queued = false;
+    var tooSmall = window.innerWidth < 520 || window.innerHeight < 420;
+    var next = tooSmall || overlapsContent();
+    if (next === hidden) return;
+    hidden = next;
+    bf.classList.toggle('is-hidden', next);
+  }
+
+  function schedule() {
+    if (queued) return;
+    queued = true;
+    window.requestAnimationFrame(apply);
+  }
+
+  window.addEventListener('scroll', schedule, { passive: true });
+  window.addEventListener('resize', schedule);
+  window.addEventListener('load', schedule);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(schedule);
+  if ('ResizeObserver' in window) new ResizeObserver(schedule).observe(document.body);
+  if ('MutationObserver' in window) {
+    new MutationObserver(schedule).observe(document.body, {
+      childList: true, subtree: true, characterData: true,
+      attributes: true, attributeFilter: ['class', 'style']
+    });
+  }
+  schedule();
 })();
 </script>
 </body>

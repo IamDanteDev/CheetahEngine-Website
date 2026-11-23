@@ -1,0 +1,61 @@
+# Cheetah Engine
+
+> Official website for Cheetah Engine, a Friday Night Funkin' engine focused on modding, customization and creator tools.
+
+## Download statistics URL strings
+
+Append a query string to the website URL to get a single plain-text value as the whole page. Both `?stats=` and `?api=` work; unknown or missing values fall back to `all`.
+
+- `?stats=total` — total download count across all release assets, bare integer
+- `?stats=windows` — download count for `CheetahEngine-Windows.zip`, bare integer
+- `?stats=linux` — download count for `CheetahEngine-Linux.zip`, bare integer
+- `?stats=updated` — release `published_at` formatted as `MMM D, YYYY` (en-US)
+- `?stats=all` — the full multi-line block described below (also the default)
+
+Base URL: https://iamdantedev.github.io/CheetahEngine-Website/
+
+Examples:
+- https://iamdantedev.github.io/CheetahEngine-Website/?stats=total
+- https://iamdantedev.github.io/CheetahEngine-Website/?stats=windows
+- https://iamdantedev.github.io/CheetahEngine-Website/?stats=linux
+- https://iamdantedev.github.io/CheetahEngine-Website/?stats=updated
+- https://iamdantedev.github.io/CheetahEngine-Website/?api=all
+
+## Download statistics strings
+
+The Downloads section shows live text strings that are generated in the browser from the GitHub REST API. AI agents do not need to execute JavaScript to read the same values: use the authoritative API endpoint below.
+
+- Source: https://api.github.com/repos/Cheetahbrawl291/FNFCheetahEngine/releases/tags/Release
+- Fields: `assets[].name`, `assets[].download_count`, `assets[].size`, `published_at`, `tag_name`
+- Browser cache: 10 minutes in `localStorage` under `cheetah-release-info-v4`
+
+### Main string (`#apiString`)
+
+One value per line, in this order:
+
+- `Total downloads: <N>` — sum of `download_count` across all release assets
+- `<OS>: <N>` — one line per asset, OS name derived from `CheetahEngine-<OS>.zip`
+- `Last update: <MMM D, YYYY>` — `published_at` formatted for `en-US`
+
+Example rendering (numbers change over time; use the URL strings or API endpoint above for live values):
+
+```
+Total downloads: 11
+Linux: 5
+Windows: 6
+Last update: Nov 22, 2026
+```
+
+### Related strings on the same page
+
+- Per-platform label: `<count> downloads · <MB> MB` (`size / 1048576`, rounded)
+- Release label: `<tag_name> · Updated <MMM D, YYYY>`
+- Star count: `★ <stargazers_count>` from https://api.github.com/repos/Cheetahbrawl291/FNFCheetahEngine
+
+## Links
+
+- Website: https://iamdantedev.github.io/CheetahEngine-Website/
+- Engine source: https://github.com/Cheetahbrawl291/FNFCheetahEngine
+- Releases: https://github.com/Cheetahbrawl291/FNFCheetahEngine/releases
+- Discord: https://discord.gg/ma6dKBHPRp
+- GameBanana: https://gamebanana.com/wips/104076
