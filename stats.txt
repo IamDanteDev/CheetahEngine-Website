@@ -1,4 +1,4 @@
-Total downloads: 14
-Linux: 5
-Windows: 9
+Total downloads: 17
+Linux: 6
+Windows: 11
 Last update: Nov 22, 2026
