@@ -1,6 +1,6 @@
 # Latest GitHub release downloads
 
-Objective: make the site's Downloads section use the newest GitHub release instead of the fixed `Release` tag. Branch: `feature/latest-release-downloads`. Delivery: reviewable work-unit commits, no push/PR/merge. Checks: `python3 -m unittest discover -s tests -v`, live payload generator run, `node --check` on inline JS, YAML/XML parse, raw HTTP GET.
+Objective: make the site's Downloads section use the newest GitHub release instead of the fixed `Release` tag. Branch: `feature/latest-release-downloads`. Delivery: reviewable work-unit commits; push to `origin main` later authorized by the user. Checks: `python3 -m unittest discover -s tests -v`, live payload generator run, `node --check` on inline JS, YAML/XML parse, raw HTTP GET.
 
 ## Specs
 
@@ -14,9 +14,9 @@ S4. Standing constraints from prior work: site content in English, user-facing c
 
 ## Tasks
 
-T1 | S1,S2 | inline | done | e4a84c0 — tests first (RED 6/13 failures), generator + workflow; 13/13 GREEN
-T2 | S1,S3 | inline | done | e4a84c0 — index.html markers, data-download links, JSON-LD and inline JS latest-release rendering
-T3 | S1-S4 | inline | in progress | 4d0cd62 — live payload regeneration and local checks pass; independent verifier S1-S4 MET, no blockers; 18/18 GREEN with durable probes; native review and push to origin/main pending (publish authorized by user)
+T1 | S1,S2 | inline | done | 6caf46c — tests first (RED 6/13 failures), generator + workflow; 13/13 GREEN
+T2 | S1,S3 | inline | done | 6caf46c — index.html markers, data-download links, JSON-LD and inline JS latest-release rendering
+T3 | S1-S4 | inline | done | e6535d6 — live payload regeneration and local checks pass; independent verifier S1-S4 MET, no blockers; 18/18 GREEN with durable probes; native RDD review approved/acknowledged; pushed to origin/main and verified live
 
 ## Log
 
@@ -31,3 +31,5 @@ L4. 2026-11-28 — consequence disclosed: the latest release's assets currently 
 L5. 2026-11-28 — independent verifier (`gentle-ai-verify`) returned S1-S4 MET, no blockers. It confirmed crawler-visible `27-nov-2026` URLs and JSON-LD, byte-identical rejection of unsafe/missing URLs, unchanged workflow triggers and stats paths, runtime `/releases/latest` with `v5` cache and intact fallback, and no push/PR/merge. Advisories reproduced on baseline: `llms.txt` still mentions the old API tag and v4 cache key; not download URLs and left unchanged to avoid scope expansion.
 
 L6. 2026-11-28 — durable probes added in `tests/test_latest_release_probes.py` after correcting two harness defects from the verifier's suggested code: the Node harness must read `process.argv[2]` (client path) and the client block must stop at the release IIFE's own `})();`, not the star-count IIFE's. Full suite: 18/18 OK. Work units committed locally: `e4a84c0` (behavior + original tests), `4d0cd62` (independent probes + document). Pre-existing `odd/tasks/crawler-visible-download-stats.md` modification and `.atl/` stayed unstaged.
+
+L7. 2026-11-28 — user authorized publishing: "ahora publica al repo website de la web el que tiene todo moenos el /game". Before push, `origin/main` advanced with three scheduled `chore: refresh download stats` commits (`aed30a1`, `5af2d6c`, `3b65e92`); feature branch rebased onto `3b65e92`, resolving three generated-file conflicts by keeping the baked latest-release versions. Final work units: `6caf46c` (behavior + tests) and `e6535d6` (probes + document). Post-rebase: 18/18 OK; native RDD assess `high`/`review_due`, review lineage `review-f6b5d869d1472a88` captured risk + reliability with no admitted findings and was acknowledged (authority burned). Duplicate reattempted reviewer results after burn did not reopen the closed review; their advisory findings (JSON-LD `<` escaping, stale-link no-fail on missing assets, client fallback untested) are non-blocking follow-ups. Pushed `feature/latest-release-downloads:main` to `3b65e92..e6535d6`. GitHub Pages built commit `e6535d6` and the live site at `https://iamdantedev.github.io/CheetahEngine-Website/` now serves `releases/download/27-nov-2026/CheetahEngine-Windows.zip` and `.../CheetahEngine-Linux.zip`, zero fixed `Release` links, `"softwareVersion": "27-nov-2026"`. No PR or merge was created.
