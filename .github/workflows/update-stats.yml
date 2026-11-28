@@ -25,13 +25,13 @@ jobs:
         with:
           ref: main
 
-      - name: Regenerate static stats
+      - name: Regenerate static download links and stats
         env:
           GH_TOKEN: ${{ github.token }}
           ENGINE_REPO: Cheetahbrawl291/FNFCheetahEngine
         run: |
           set -euo pipefail
-          gh api "repos/$ENGINE_REPO/releases/tags/Release" > release.json
+          gh api "repos/$ENGINE_REPO/releases/latest" > release.json
           python3 scripts/update-stats.py release.json
           rm release.json
 

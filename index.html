@@ -18,10 +18,10 @@
   "operatingSystem": "Windows, Linux",
   "url": "https://iamdantedev.github.io/CheetahEngine-Website/",
   "description": "A Friday Night Funkin' engine built for modding, customization and creators.",
-  "softwareVersion": "Release",
+  "softwareVersion": "27-nov-2026",
   "downloadUrl": [
-    "https://github.com/Cheetahbrawl291/FNFCheetahEngine/releases/download/Release/CheetahEngine-Windows.zip",
-    "https://github.com/Cheetahbrawl291/FNFCheetahEngine/releases/download/Release/CheetahEngine-Linux.zip"
+    "https://github.com/Cheetahbrawl291/FNFCheetahEngine/releases/download/27-nov-2026/CheetahEngine-Windows.zip",
+    "https://github.com/Cheetahbrawl291/FNFCheetahEngine/releases/download/27-nov-2026/CheetahEngine-Linux.zip"
   ]
 }
 </script>
@@ -166,12 +166,14 @@ footer a{color:#ccc}
 <section id="downloads">
 <h2>Downloads</h2>
 <div class="experimental">
-<div class="os-links"><a href="https://github.com/Cheetahbrawl291/FNFCheetahEngine/releases/download/Release/CheetahEngine-Windows.zip"><img class="os-icon" src="assets/Windows.svg" alt=""> Windows<span class="dl-count" data-asset="CheetahEngine-Windows.zip"></span></a><a href="https://github.com/Cheetahbrawl291/FNFCheetahEngine/releases/download/Release/CheetahEngine-Linux.zip"><img class="os-icon" src="assets/Linux.svg" alt=""> Linux<span class="dl-count" data-asset="CheetahEngine-Linux.zip"></span></a><a href="https://github.com/Cheetahbrawl291/FNFCheetahEngine/releases" target="_blank" rel="noopener"><img class="os-icon" src="assets/github.svg" alt=""> View other versions</a><a href="https://gamebanana.com/wips/104076" target="_blank" rel="noopener"><img class="os-icon" src="assets/gamebanana.svg" alt=""> GameBanana</a></div>
+<!-- DOWNLOADS:START -->
+<div class="os-links"><a data-download="CheetahEngine-Windows.zip" href="https://github.com/Cheetahbrawl291/FNFCheetahEngine/releases/download/27-nov-2026/CheetahEngine-Windows.zip"><img class="os-icon" src="assets/Windows.svg" alt=""> Windows<span class="dl-count" data-asset="CheetahEngine-Windows.zip"></span></a><a data-download="CheetahEngine-Linux.zip" href="https://github.com/Cheetahbrawl291/FNFCheetahEngine/releases/download/27-nov-2026/CheetahEngine-Linux.zip"><img class="os-icon" src="assets/Linux.svg" alt=""> Linux<span class="dl-count" data-asset="CheetahEngine-Linux.zip"></span></a><a href="https://github.com/Cheetahbrawl291/FNFCheetahEngine/releases" target="_blank" rel="noopener"><img class="os-icon" src="assets/github.svg" alt=""> View other versions</a><a href="https://gamebanana.com/wips/104076" target="_blank" rel="noopener"><img class="os-icon" src="assets/gamebanana.svg" alt=""> GameBanana</a></div>
+<!-- DOWNLOADS:END -->
 <div class="release-meta" id="releaseMeta"></div>
-<div class="api-string" id="apiString" aria-live="polite"><!-- STATS:START -->Total downloads: 19
-Linux: 7
-Windows: 12
-Last update: Nov 22, 2026<!-- STATS:END --></div>
+<div class="api-string" id="apiString" aria-live="polite"><!-- STATS:START -->Total downloads: 0
+Linux: 0
+Windows: 0
+Last update: Nov 28, 2026<!-- STATS:END --></div>
 <a class="stats-link" href="stats/">Full stats page</a> <a class="stats-link" href="stats.txt">Plain text</a>
 </div>
 </section>
@@ -221,15 +223,21 @@ document.addEventListener('selectstart', function (e) {
 });
 (function () {
   var nodes = document.querySelectorAll('.dl-count');
+  var downloadLinks = document.querySelectorAll('.os-links a[data-download]');
   var meta = document.getElementById('releaseMeta');
   var apiString = document.getElementById('apiString');
   var root = document.documentElement;
   if (!nodes.length || !window.fetch) return;
-  var cacheKey = 'cheetah-release-info-v4';
+  var cacheKey = 'cheetah-release-info-v5';
   function sizeLabel(bytes) { return (bytes / 1048576).toFixed(0) + ' MB'; }
   function dateLabel(iso) {
     var date = new Date(iso);
     return isNaN(date.getTime()) ? '' : date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+  function releaseAssetUrl(value) {
+    var prefix = 'https://github.com/Cheetahbrawl291/FNFCheetahEngine/releases/download/';
+    if (typeof value !== 'string' || value.indexOf(prefix) !== 0) return null;
+    return /\.zip$/.test(value) ? value : null;
   }
   function assetCount(info, name) {
     return typeof info.counts[name] === 'number' ? info.counts[name] : 0;
@@ -250,6 +258,10 @@ document.addEventListener('selectstart', function (e) {
     return lines.join('\n');
   }
   function render(info) {
+    downloadLinks.forEach(function (a) {
+      var url = info.urls[a.getAttribute('data-download')];
+      if (url) a.setAttribute('href', url);
+    });
     nodes.forEach(function (n) {
       var name = n.getAttribute('data-asset');
       var value = info.counts[name];
@@ -271,13 +283,15 @@ document.addEventListener('selectstart', function (e) {
     var cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
     if (cached && Date.now() - cached.time < 600000) { render(cached.info); return; }
   } catch (e) {}
-  fetch('https://api.github.com/repos/Cheetahbrawl291/FNFCheetahEngine/releases/tags/Release')
+  fetch('https://api.github.com/repos/Cheetahbrawl291/FNFCheetahEngine/releases/latest')
     .then(function (r) { if (!r.ok) throw new Error('release api'); return r.json(); })
     .then(function (data) {
-      var info = { counts: {}, sizes: {}, date: data.published_at, tag: data.tag_name };
+      var info = { counts: {}, sizes: {}, urls: {}, date: data.published_at, tag: data.tag_name };
       (data.assets || []).forEach(function (a) {
         info.counts[a.name] = a.download_count;
         info.sizes[a.name] = a.size;
+        var url = releaseAssetUrl(a.browser_download_url);
+        if (url) info.urls[a.name] = url;
       });
       render(info);
       try { localStorage.setItem(cacheKey, JSON.stringify({ time: Date.now(), info: info })); } catch (e) {}

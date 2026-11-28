@@ -39,6 +39,15 @@ class UpdateStatsTest(unittest.TestCase):
             encoding="utf-8",
         )
 
+    def strip_download_marker(self, rel):
+        path = self.root / rel
+        path.write_text(
+            path.read_text(encoding="utf-8")
+            .replace("<!-- DOWNLOADS:START -->", "")
+            .replace("<!-- DOWNLOADS:END -->", ""),
+            encoding="utf-8",
+        )
+
     def run_script(self, payload=None, raw=None):
         fixture = self.root / "payload.json"
         fixture.write_text(raw if raw is not None else json.dumps(payload), encoding="utf-8")
@@ -138,6 +147,96 @@ class UpdateStatsTest(unittest.TestCase):
                     "CheetahEngine-Website/" + rel,
                     (REPO / name).read_text(encoding="utf-8"),
                 )
+
+
+    def latest_payload(self, names=("CheetahEngine-Windows.zip", "CheetahEngine-Linux.zip")):
+        urls = {
+            "CheetahEngine-Windows.zip": "https://github.com/Cheetahbrawl291/FNFCheetahEngine/releases/download/27-nov-2026/CheetahEngine-Windows.zip",
+            "CheetahEngine-Linux.zip": "https://github.com/Cheetahbrawl291/FNFCheetahEngine/releases/download/27-nov-2026/CheetahEngine-Linux.zip",
+        }
+        return {
+            "tag_name": "27-nov-2026",
+            "published_at": "2026-11-28T01:55:07Z",
+            "assets": [
+                {
+                    "name": name,
+                    "download_count": index + 1,
+                    "browser_download_url": urls[name],
+                }
+                for index, name in enumerate(names)
+            ],
+        }
+
+    def test_latest_release_urls_are_baked_for_crawlers(self):
+        payload = self.latest_payload()
+        result = self.run_script(payload=payload)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        index = (self.root / "index.html").read_text(encoding="utf-8")
+        for asset in payload["assets"]:
+            self.assertIn('data-download="{}"'.format(asset["name"]), index)
+            self.assertIn(asset["browser_download_url"], index)
+        self.assertIn('"softwareVersion": "27-nov-2026"', index)
+        self.assertNotIn("releases/download/Release/", index)
+
+    def test_latest_url_rewrite_is_idempotent(self):
+        payload = self.latest_payload()
+        self.assertEqual(self.run_script(payload=payload).returncode, 0)
+        before = self.hashes()
+        result = self.run_script(payload=payload)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(self.hashes(), before)
+
+    def test_missing_asset_keeps_previous_download_link(self):
+        first = self.run_script(payload=self.latest_payload())
+        self.assertEqual(first.returncode, 0, first.stderr)
+        index = (self.root / "index.html").read_text(encoding="utf-8")
+        windows_url = next(
+            a["browser_download_url"]
+            for a in self.latest_payload()["assets"]
+            if a["name"] == "CheetahEngine-Windows.zip"
+        )
+        linux_url = next(
+            a["browser_download_url"]
+            for a in self.latest_payload()["assets"]
+            if a["name"] == "CheetahEngine-Linux.zip"
+        )
+        result = self.run_script(payload=self.latest_payload(("CheetahEngine-Windows.zip",)))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        updated = (self.root / "index.html").read_text(encoding="utf-8")
+        self.assertIn(windows_url, updated)
+        self.assertIn(linux_url, updated)
+
+    def test_unsafe_asset_url_is_rejected_before_any_write(self):
+        before = self.hashes()
+        payload = self.latest_payload()
+        payload["assets"][0]["browser_download_url"] = "https://evil.example/malware.zip"
+        self.assertNotEqual(self.run_script(payload=payload).returncode, 0)
+        self.assertEqual(self.hashes(), before)
+
+    def test_missing_download_marker_rejects_before_any_write(self):
+        self.strip_download_marker("index.html")
+        before = self.hashes()
+        result = self.run_script(payload=self.latest_payload())
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(
+            result.stderr.strip(),
+            "expected one DOWNLOADS marker pair in index.html, found 0",
+        )
+        self.assertEqual(self.hashes(), before)
+
+    def test_workflow_uses_latest_release(self):
+        workflow = (REPO / ".github" / "workflows" / "update-stats.yml").read_text(encoding="utf-8")
+        self.assertIn("releases/latest", workflow)
+        self.assertNotIn("releases/tags/Release", workflow)
+
+    def test_client_uses_latest_release_with_static_fallback(self):
+        index = (REPO / "index.html").read_text(encoding="utf-8")
+        self.assertIn("<!-- DOWNLOADS:START -->", index)
+        self.assertIn("<!-- DOWNLOADS:END -->", index)
+        self.assertIn('data-download="CheetahEngine-Windows.zip"', index)
+        self.assertIn('data-download="CheetahEngine-Linux.zip"', index)
+        self.assertIn("/releases/latest", index)
+        self.assertNotIn("/tags/Release", index)
 
 
 if __name__ == "__main__":
